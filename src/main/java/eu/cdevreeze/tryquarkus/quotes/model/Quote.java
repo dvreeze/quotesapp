@@ -28,9 +28,6 @@ import java.util.List;
  */
 public record Quote(String quoteText, String attributedTo, ImmutableSet<String> subjects) {
 
-    public Quote {
-    }
-
     public JsonbQuote toJsonbQuote() {
         return new JsonbQuote(quoteText(), attributedTo(), subjects().stream().sorted().toList());
     }

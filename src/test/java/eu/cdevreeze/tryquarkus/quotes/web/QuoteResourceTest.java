@@ -127,8 +127,6 @@ class QuoteResourceTest {
         assertEquals(200, response.statusCode());
         assertTrue(response.contentType().startsWith("application/json"));
 
-        JsonBuilderFactory jbf = jsonProvider.createBuilderFactory(Map.of());
-
         JsonValue jsonPayload =
                 jsonProvider.createReader(new StringReader(response.getBody().asPrettyString())).readValue();
 

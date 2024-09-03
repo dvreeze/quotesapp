@@ -25,8 +25,8 @@ import jakarta.json.spi.JsonProvider;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,21 +61,21 @@ class QuoteResourceTest {
                 jbf.createObjectBuilder()
                         .add("quoteText", "Real patriotism is a willingness to challenge the government when it's wrong.")
                         .add("attributedTo", "Ron Paul")
-                        .add("subjects", jbf.createArrayBuilder(List.of("patriotism", "liberty")))
+                        .add("subjects", jbf.createArrayBuilder(Set.of("patriotism", "liberty").stream().sorted().toList()))
                         .build()
         ));
         assertTrue(jsonPayload.asJsonArray().contains(
                 jbf.createObjectBuilder()
                         .add("quoteText", "War is never economically beneficial except for those in position to profit from war expenditures.")
                         .add("attributedTo", "Ron Paul")
-                        .add("subjects", jbf.createArrayBuilder(List.of("war", "profit")))
+                        .add("subjects", jbf.createArrayBuilder(Set.of("war", "profit").stream().sorted().toList()))
                         .build()
         ));
         assertTrue(jsonPayload.asJsonArray().contains(
                 jbf.createObjectBuilder()
                         .add("quoteText", "If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.")
                         .add("attributedTo", "Nikola Tesla")
-                        .add("subjects", jbf.createArrayBuilder(List.of("hidden knowledge")))
+                        .add("subjects", jbf.createArrayBuilder(Set.of("hidden knowledge").stream().sorted().toList()))
                         .build()
         ));
     }
@@ -99,14 +99,14 @@ class QuoteResourceTest {
                 jbf.createObjectBuilder()
                         .add("quoteText", "Real patriotism is a willingness to challenge the government when it's wrong.")
                         .add("attributedTo", "Ron Paul")
-                        .add("subjects", jbf.createArrayBuilder(List.of("patriotism", "liberty")))
+                        .add("subjects", jbf.createArrayBuilder(Set.of("patriotism", "liberty").stream().sorted().toList()))
                         .build()
         ));
         assertTrue(jsonPayload.asJsonArray().contains(
                 jbf.createObjectBuilder()
                         .add("quoteText", "War is never economically beneficial except for those in position to profit from war expenditures.")
                         .add("attributedTo", "Ron Paul")
-                        .add("subjects", jbf.createArrayBuilder(List.of("war", "profit")))
+                        .add("subjects", jbf.createArrayBuilder(Set.of("war", "profit").stream().sorted().toList()))
                         .build()
         ));
 

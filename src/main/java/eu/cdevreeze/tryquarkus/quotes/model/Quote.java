@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.tryquarkus.quotes.model;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import jakarta.json.bind.annotation.JsonbCreator;
 
 import java.util.List;
@@ -26,17 +26,17 @@ import java.util.List;
  *
  * @author Chris de Vreeze
  */
-public record Quote(String quoteText, String attributedTo, ImmutableList<String> subjects) {
+public record Quote(String quoteText, String attributedTo, ImmutableSet<String> subjects) {
 
     public Quote {
     }
 
     public JsonbQuote toJsonbQuote() {
-        return new JsonbQuote(quoteText(), attributedTo(), List.copyOf(subjects()));
+        return new JsonbQuote(quoteText(), attributedTo(), subjects().stream().sorted().toList());
     }
 
     public static Quote fromJsonbQuote(JsonbQuote jsonbQuote) {
-        return new Quote(jsonbQuote.quoteText(), jsonbQuote.attributedTo(), ImmutableList.copyOf(jsonbQuote.subjects()));
+        return new Quote(jsonbQuote.quoteText(), jsonbQuote.attributedTo(), ImmutableSet.copyOf(jsonbQuote.subjects()));
     }
 
     public record JsonbQuote(String quoteText, String attributedTo, List<String> subjects) {

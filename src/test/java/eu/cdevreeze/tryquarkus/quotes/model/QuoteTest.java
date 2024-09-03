@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.tryquarkus.quotes.model;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class QuoteTest {
                 """
                         Legitimate use of violence can only be that which is required in self-defense.""",
                 "Ron Paul",
-                ImmutableList.of("defense")
+                ImmutableSet.of("defense")
         );
 
         try (Jsonb jsonb = JsonbBuilder.create()) {
@@ -53,7 +53,7 @@ class QuoteTest {
                 """
                         Legitimate use of violence can only be that which is required in self-defense.""",
                 "Ron Paul",
-                ImmutableList.of("defense")
+                ImmutableSet.of("defense")
         );
 
         try (Jsonb jsonb = JsonbBuilder.create()) {

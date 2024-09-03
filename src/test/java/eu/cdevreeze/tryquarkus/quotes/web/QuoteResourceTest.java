@@ -17,10 +17,20 @@
 package eu.cdevreeze.tryquarkus.quotes.web;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.response.Response;
+import jakarta.json.JsonBuilderFactory;
+import jakarta.json.JsonPointer;
+import jakarta.json.JsonValue;
+import jakarta.json.spi.JsonProvider;
 import org.junit.jupiter.api.Test;
 
+import java.io.StringReader;
+import java.util.List;
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Quote web resource test.
@@ -30,13 +40,107 @@ import static org.hamcrest.CoreMatchers.containsString;
 @QuarkusTest
 class QuoteResourceTest {
 
+    private final JsonProvider jsonProvider = JsonProvider.provider();
+
     @Test
-    void testHelloEndpoint() {
-        given()
-          .when().get("/quotes")
-          .then()
-             .statusCode(200)
-             .body(containsString("Ron Paul"));
+    void testQuotesEndpoint() {
+        Response response =
+                given()
+                        .when().get("/quotes")
+                        .then()
+                        .extract().response();
+
+        assertEquals(200, response.statusCode());
+        assertTrue(response.contentType().startsWith("application/json"));
+
+        JsonBuilderFactory jbf = jsonProvider.createBuilderFactory(Map.of());
+
+        JsonValue jsonPayload =
+                jsonProvider.createReader(new StringReader(response.getBody().asPrettyString())).readValue();
+        assertTrue(jsonPayload.asJsonArray().contains(
+                jbf.createObjectBuilder()
+                        .add("quoteText", "Real patriotism is a willingness to challenge the government when it's wrong.")
+                        .add("attributedTo", "Ron Paul")
+                        .add("subjects", jbf.createArrayBuilder(List.of("patriotism", "liberty")))
+                        .build()
+        ));
+        assertTrue(jsonPayload.asJsonArray().contains(
+                jbf.createObjectBuilder()
+                        .add("quoteText", "War is never economically beneficial except for those in position to profit from war expenditures.")
+                        .add("attributedTo", "Ron Paul")
+                        .add("subjects", jbf.createArrayBuilder(List.of("war", "profit")))
+                        .build()
+        ));
+        assertTrue(jsonPayload.asJsonArray().contains(
+                jbf.createObjectBuilder()
+                        .add("quoteText", "If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.")
+                        .add("attributedTo", "Nikola Tesla")
+                        .add("subjects", jbf.createArrayBuilder(List.of("hidden knowledge")))
+                        .build()
+        ));
     }
 
+    @Test
+    void testQuotesByAuthorEndpoint() {
+        Response response =
+                given()
+                        .when().get("/quotes/attributedTo/Ron Paul")
+                        .then()
+                        .extract().response();
+
+        assertEquals(200, response.statusCode());
+        assertTrue(response.contentType().startsWith("application/json"));
+
+        JsonBuilderFactory jbf = jsonProvider.createBuilderFactory(Map.of());
+
+        JsonValue jsonPayload =
+                jsonProvider.createReader(new StringReader(response.getBody().asPrettyString())).readValue();
+        assertTrue(jsonPayload.asJsonArray().contains(
+                jbf.createObjectBuilder()
+                        .add("quoteText", "Real patriotism is a willingness to challenge the government when it's wrong.")
+                        .add("attributedTo", "Ron Paul")
+                        .add("subjects", jbf.createArrayBuilder(List.of("patriotism", "liberty")))
+                        .build()
+        ));
+        assertTrue(jsonPayload.asJsonArray().contains(
+                jbf.createObjectBuilder()
+                        .add("quoteText", "War is never economically beneficial except for those in position to profit from war expenditures.")
+                        .add("attributedTo", "Ron Paul")
+                        .add("subjects", jbf.createArrayBuilder(List.of("war", "profit")))
+                        .build()
+        ));
+
+        JsonPointer jsonPointer = jsonProvider.createPointer("/attributedTo");
+        assertTrue(jsonPayload.asJsonArray().stream()
+                .map(JsonValue::asJsonObject)
+                .allMatch(v -> jsonPointer.getValue(v).equals(jsonProvider.createValue("Ron Paul"))));
+    }
+
+    @Test
+    void testQuotesBySubjectEndpoint() {
+        Response response =
+                given()
+                        .when().get("/quotes/subject/peace")
+                        .then()
+                        .extract().response();
+
+        assertEquals(200, response.statusCode());
+        assertTrue(response.contentType().startsWith("application/json"));
+
+        JsonBuilderFactory jbf = jsonProvider.createBuilderFactory(Map.of());
+
+        JsonValue jsonPayload =
+                jsonProvider.createReader(new StringReader(response.getBody().asPrettyString())).readValue();
+
+        JsonPointer subjectsJsonPointer = jsonProvider.createPointer("/subjects");
+        JsonPointer attributedToJsonPointer = jsonProvider.createPointer("/attributedTo");
+
+        assertTrue(jsonPayload.asJsonArray().stream()
+                .map(JsonValue::asJsonObject)
+                .allMatch(v -> subjectsJsonPointer.getValue(v).asJsonArray().contains(jsonProvider.createValue("peace"))));
+
+        assertTrue(jsonPayload.asJsonArray().stream()
+                .map(JsonValue::asJsonObject)
+                .allMatch(v -> attributedToJsonPointer.getValue(v).equals(jsonProvider.createValue("Ron Paul"))));
+    }
 }

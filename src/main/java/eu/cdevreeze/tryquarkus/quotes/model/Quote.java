@@ -26,7 +26,10 @@ import java.util.List;
  *
  * @author Chris de Vreeze
  */
-public record Quote(String quoteText, String attributedTo, ImmutableSet<String> subjects) {
+public record Quote(
+        String quoteText,
+        String attributedTo,
+        ImmutableSet<String> subjects) {
 
     public JsonbQuote toJsonbQuote() {
         return new JsonbQuote(quoteText(), attributedTo(), subjects().stream().sorted().toList());
@@ -36,6 +39,9 @@ public record Quote(String quoteText, String attributedTo, ImmutableSet<String> 
         return new Quote(jsonbQuote.quoteText(), jsonbQuote.attributedTo(), ImmutableSet.copyOf(jsonbQuote.subjects()));
     }
 
+    /**
+     * JSON serialization proxy for data class Quote
+     */
     public record JsonbQuote(String quoteText, String attributedTo, List<String> subjects) {
 
         @JsonbCreator
